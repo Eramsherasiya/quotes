@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inspire Me ✨</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>✨ Inspire Me ✨</h1>
+
+    <!-- Category Selector -->
+    <div class="category-box">
+      <label for="category">Choose Category:</label>
+      <select id="category">
+        <option value="motivation">Motivation</option>
+        <option value="life">Life</option>
+        <option value="love">Love</option>
+        <option value="fun">Fun</option>
+      </select>
+    </div>
+
+    <!-- Quote Box -->
+    <div class="quote-box">
+      <p id="quote">Click "New Quote" to get inspired 💡</p>
+      <span id="author"></span>
+    </div>
+
+    <!-- Buttons -->
+    <div class="buttons">
+      <button id="newQuote">🎲 New Quote</button>
+      <button id="copy">📋 Copy</button>
+      <button id="tweet">🐦 Tweet</button>
+    </div>
+
+    <!-- Auto Mode -->
+    <div class="auto-toggle">
+      <label>
+        <input type="checkbox" id="autoMode"> Auto New Quote (every 5s)
+      </label>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
