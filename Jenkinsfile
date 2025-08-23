@@ -34,9 +34,11 @@ pipeline {
     post {
         success {
             echo '🎉 Website deployed successfully!'
+            echo 'Release Branch is triggerred....'
         }
         failure {
             echo '❌ Build failed!'
         }
     }
 }
+
