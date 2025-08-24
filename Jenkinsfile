@@ -2,15 +2,18 @@ pipeline {
     agent any
 
     environment {
-        DEPLOY_DIR = "/var/www/html"
+        GIT_REPO = 'https://github.com/Eramsherasiya/quotes.git'
+        GIT_BRANCH = 'main'
+        GIT_CREDENTIALS = 'github-token'   // <-- Jenkins credential ID you created
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/Eramsherasiya/quotes.git',
-                    credentialsId: 'github-token'   // <-- create this in Jenkins credentials
+                // Checkout code using credentials
+                git branch: "${GIT_BRANCH}",
+                    url: "${GIT_REPO}",
+                    credentialsId: "${GIT_CREDENTIALS}"
             }
         }
 
@@ -30,8 +33,8 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying website...'
-                // rsync to deploy safely
-                sh "sudo rsync -av --delete . ${DEPLOY_DIR}/"
+                // Copy files to web server
+                sh 'cp -r * /var/www/html/ || true'
             }
         }
     }
