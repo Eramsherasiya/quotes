@@ -2,63 +2,68 @@ pipeline {
     agent any
 
     environment {
-        GIT_REPO = 'https://github.com/Eramsherasiya/quotes.git'
-        GIT_BRANCH = 'main'
-        GIT_CREDENTIALS = 'github-token'   // Jenkins credential ID
+        IMAGE_NAME     = "webapp-cicd"
+        IMAGE_TAG      = "v${env.BUILD_NUMBER}"
+        FULL_IMAGE     = "${IMAGE_NAME}:${IMAGE_TAG}"
+        LATEST_IMAGE   = "${IMAGE_NAME}:latest"
+        CONTAINER_NAME = "webapp_cicd"
+        HOST_PORT      = "8000"
+        PROBE_URL      = "http://localhost:8000/healthz"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: "${GIT_BRANCH}",
-                    url: "${GIT_REPO}",
-                    credentialsId: "${GIT_CREDENTIALS}"
+                checkout scm
             }
         }
 
         stage('Build') {
             steps {
-                echo 'No build needed (static website: HTML, CSS, JS)'
+                echo "No build needed (static website: HTML, CSS, JS)"
             }
         }
 
         stage('Test') {
             steps {
-                echo 'Running basic checks...'
+                echo "Running basic checks..."
                 sh 'ls -l'
             }
         }
 
         stage('Deploy to GitHub Pages') {
             steps {
-                echo '🚀 Deploying to GitHub Pages...'
-                sh '''
+                echo "🚀 Deploying to GitHub Pages..."
+                withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                    sh """
                     git config user.name "Jenkins CI"
                     git config user.email "ci-bot@example.com"
+                    git remote set-url origin https://$GIT_USER:$GIT_PASS@github.com/Eramsherasiya/quotes.git
 
-                    # Create a temporary worktree for gh-pages
-                    git fetch origin gh-pages || true
-                    git worktree add /tmp/gh-pages gh-pages || git checkout --orphan gh-pages
+                    # Remove old worktree if exists
+                    rm -rf /tmp/gh-pages
 
-                    # Copy site files
-                    rm -rf /tmp/gh-pages/*
-                    cp -r * /tmp/gh-pages/
+                    # Force add worktree to /tmp/gh-pages
+                    git worktree add -f /tmp/gh-pages gh-pages
 
+                    cp -r Jenkinsfile index.html script.js style.css test.txt /tmp/gh-pages/
                     cd /tmp/gh-pages
+
                     git add .
-                    git commit -m "Deploy from Jenkins build $BUILD_NUMBER" || echo "No changes to commit"
+                    git commit -m "Deploy from Jenkins build ${BUILD_NUMBER}" || echo "No changes to commit"
                     git push origin gh-pages
-                '''
+                    """
+                }
             }
         }
     }
 
     post {
         success {
-            echo '🎉 Website deployed successfully to GitHub Pages!'
+            echo "✅ Build and deployment succeeded!"
         }
         failure {
-            echo '❌ Build failed!'
+            echo "❌ Build failed!"
         }
     }
 }
