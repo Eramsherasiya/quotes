@@ -39,19 +39,17 @@ pipeline {
                     sh """
                     git config user.name "Jenkins CI"
                     git config user.email "ci-bot@example.com"
-
-                    # Clear any cached credentials
                     git credential-cache exit || true
-
-                    # Use HTTPS with token for authentication
                     git remote set-url origin https://$GIT_USER:$GIT_PASS@github.com/Eramsherasiya/quotes.git
 
-                    # Prepare gh-pages branch worktree
+                    # Remove old worktree folder if it exists
+                    rm -rf /tmp/gh-pages
+
                     git fetch origin gh-pages
                     git worktree add /tmp/gh-pages gh-pages
                     rm -rf /tmp/gh-pages/*
 
-                    # Copy all site files (exclude Jenkinsfile)
+                    # Copy site files
                     cp -r index.html style.css script.js /tmp/gh-pages/
                     cd /tmp/gh-pages
 
