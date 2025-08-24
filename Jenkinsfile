@@ -1,11 +1,16 @@
 pipeline {
     agent any
 
+    environment {
+        DEPLOY_DIR = "/var/www/html"
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                // Pull the code from GitHub
-                checkout scm
+                git branch: 'main',
+                    url: 'https://github.com/Eramsherasiya/quotes.git',
+                    credentialsId: 'github-token'   // <-- create this in Jenkins credentials
             }
         }
 
@@ -25,8 +30,8 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying website...'
-                // Copy files to Jenkins workspace (or a web server)
-                sh 'cp -r * /var/www/html/ || true'
+                // rsync to deploy safely
+                sh "sudo rsync -av --delete . ${DEPLOY_DIR}/"
             }
         }
     }
@@ -34,11 +39,9 @@ pipeline {
     post {
         success {
             echo '🎉 Website deployed successfully!'
-            echo 'hello'
         }
         failure {
             echo '❌ Build failed!'
         }
     }
 }
-
