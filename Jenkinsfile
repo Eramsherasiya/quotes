@@ -34,9 +34,11 @@ pipeline {
     post {
         success {
             echo '🎉 Website deployed successfully!'
+            echo 'hello'
         }
         failure {
             echo '❌ Build failed!'
         }
     }
 }
+
