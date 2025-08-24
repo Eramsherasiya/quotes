@@ -1,0 +1,4 @@
+echo "Jenkins test $(date)" > test.txt
+git add test.txt
+git commit -m "Testing Jenkins webhook"
+git push origin main
