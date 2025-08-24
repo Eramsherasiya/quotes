@@ -40,14 +40,17 @@ pipeline {
                     git config user.email "ci-bot@example.com"
                     git remote set-url origin https://$GIT_USER:$GIT_PASS@github.com/Eramsherasiya/quotes.git
 
-                    # Remove old worktree if exists
-                    rm -rf /tmp/gh-pages
+                    # Clean old worktrees
+                    git worktree prune
 
-                    # Force add worktree to /tmp/gh-pages
-                    git worktree add -f /tmp/gh-pages gh-pages
+                    # Use a unique worktree folder per build
+                    WORKTREE_DIR="/tmp/gh-pages-${BUILD_NUMBER}"
+                    rm -rf \$WORKTREE_DIR
+                    git worktree add -f \$WORKTREE_DIR gh-pages
 
-                    cp -r Jenkinsfile index.html script.js style.css test.txt /tmp/gh-pages/
-                    cd /tmp/gh-pages
+                    # Copy files to worktree
+                    cp -r Jenkinsfile index.html script.js style.css test.txt \$WORKTREE_DIR/
+                    cd \$WORKTREE_DIR
 
                     git add .
                     git commit -m "Deploy from Jenkins build ${BUILD_NUMBER}" || echo "No changes to commit"
